@@ -19,7 +19,7 @@ x_consumer_id = "76765b63d1a2646c786d6714e6209707"
 
 
 SUPABASE_URL="https://oxasehqygbnohwzbdbgp.supabase.co"
-SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94YXNlaHF5Z2Jub2h3emJkYmdwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Nzc4NjQ3MCwiZXhwIjoyMDgzMzYyNDcwfQ.KVHiRhoZkEvZLUE3sXnVqZPtaA2d2X97A-liv5MnUic"
+SUPABASE_KEY=""
 
 headers = {
     "apikey": SUPABASE_KEY,
