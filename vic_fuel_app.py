@@ -423,3 +423,47 @@ fig.update_layout(
     )
 st.plotly_chart(fig,width='content', key="map_chart")
 ##fig.show()  
+
+
+fig = px.scatter_mapbox(station_plot_df,
+                        lat="latitude",
+                        lon="longitude",
+                        hover_name="station_name",
+                        hover_data={
+                            "address": True,
+                            "postcode": False,
+                            "price_updatedAt_au": True,
+                            "all_fuel_prices_available": True,
+                            "latitude": False,
+                            "longitude": False
+                        },
+                        labels={
+                            "all_fuel_prices_available": "Fuel Available",
+                            "price_updatedAt_au": 'Last Updated'
+                        },
+                        zoom=11,
+                        center=CASEY_CENTER,
+                        height=560,
+                        title="Fuel Stations in Victoria by Postcode")
+
+# FIXED: Manually set marker size and style
+fig.update_traces(
+    marker=dict(
+        size=12,  # Set marker size
+        opacity=0.8,
+        color='#0083B8'  # Optional: set color
+    )
+)
+
+fig.update_layout(
+    margin=dict(t=0, b=0, l=0, r=0),
+    coloraxis_colorbar=dict(
+        thickness=14,
+        len=0.6,
+        tickfont=dict(size=10),
+    ),
+    paper_bgcolor="rgba(0,0,0,0)",
+    mapbox_style="open-street-map"
+)
+
+st.plotly_chart(fig, use_container_width=True, key="map_chart2")
