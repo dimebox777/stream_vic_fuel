@@ -384,7 +384,7 @@ station_plot_df = station_fuel_details.copy()
 
 
 ##st.markdown(df['suburb'].unique())
-# Create a scatter map using the aggregated station data
+## Create a scatter map using the aggregated station data
 fig = px.scatter_mapbox(station_plot_df,
                         lat="latitude",
                         lon="longitude",
