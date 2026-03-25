@@ -733,21 +733,21 @@ station_plot_df = station_fuel_details.copy()
 # st.plotly_chart(fig, use_container_width=True, config=config, key="map_chart")
 
 
-# Absolute simplest version possible
-fig = px.scatter_mapbox(
-    station_plot_df,
-    lat="latitude",
-    lon="longitude",
-    text="station_name"
-)
+# # Absolute simplest version possible
+# fig = px.scatter_mapbox(
+#     station_plot_df,
+#     lat="latitude",
+#     lon="longitude",
+#     text="station_name"
+# )
 
-fig.update_traces(marker={'size': 20, 'color': 'red'})
-fig.update_layout(
-    mapbox={'style': "open-street-map", 'zoom': 11, 'center': {"lat": -38.05, "lon": 145.33}},
-    height=600
-)
+# fig.update_traces(marker={'size': 20, 'color': 'red'})
+# fig.update_layout(
+#     mapbox={'style': "open-street-map", 'zoom': 11, 'center': {"lat": -38.05, "lon": 145.33}},
+#     height=600
+# )
 
-st.plotly_chart(fig)
+# st.plotly_chart(fig)
 
 
 
