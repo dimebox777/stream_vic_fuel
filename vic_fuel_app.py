@@ -637,52 +637,88 @@ station_plot_df = station_fuel_details.copy()
 
 
 
-# Your CASEY_CENTER
-CASEY_CENTER = {"lat": -38.05, "lon": 145.33}
+# # Your CASEY_CENTER
+# CASEY_CENTER = {"lat": -38.05, "lon": 145.33}
 
-# Create hover text manually for better control
-hover_texts = []
-for idx, row in station_plot_df.iterrows():
-    hover_text = (
-        f"<b>{row['station_name']}</b><br>"
-        f"Address: {row['address']}<br>"
-        f"Postcode: {row['postcode']}<br>"
-        f"Last Updated: {row['price_updatedAt_au']}<br>"
-        f"Fuel Available: {row['all_fuel_prices_available']}"
-    )
-    hover_texts.append(hover_text)
+# # Create hover text manually for better control
+# hover_texts = []
+# for idx, row in station_plot_df.iterrows():
+#     hover_text = (
+#         f"<b>{row['station_name']}</b><br>"
+#         f"Address: {row['address']}<br>"
+#         f"Postcode: {row['postcode']}<br>"
+#         f"Last Updated: {row['price_updatedAt_au']}<br>"
+#         f"Fuel Available: {row['all_fuel_prices_available']}"
+#     )
+#     hover_texts.append(hover_text)
 
-# Create the map using graph_objects (more reliable than px)
-fig = go.Figure()
+# # Create the map using graph_objects (more reliable than px)
+# fig = go.Figure()
 
-fig.add_trace(go.Scattermapbox(
-    lat=station_plot_df['latitude'],
-    lon=station_plot_df['longitude'],
-    mode='markers',
-    marker=dict(
-        size=14,
-        color='#0083B8',
-        opacity=0.7
-    ),
-    text=hover_texts,
-    hoverinfo='text',
-    name='Fuel Stations'
-))
+# fig.add_trace(go.Scattermapbox(
+#     lat=station_plot_df['latitude'],
+#     lon=station_plot_df['longitude'],
+#     mode='markers',
+#     marker=dict(
+#         size=14,
+#         color='#0083B8',
+#         opacity=0.7
+#     ),
+#     text=hover_texts,
+#     hoverinfo='text',
+#     name='Fuel Stations'
+# ))
+
+# fig.update_layout(
+#     mapbox=dict(
+#         style="open-street-map",
+#         center=CASEY_CENTER,
+#         zoom=11
+#     ),
+#     height=560,
+#     margin=dict(t=40, b=0, l=0, r=0),
+#     title="Fuel Stations in Victoria by Postcode",
+#     showlegend=False,
+#     hovermode='closest'
+# )
+
+# st.plotly_chart(fig, use_container_width=True, key="map_chart")
+
+
+
+
+
+# Add a dummy size column
+station_plot_df['size'] = 1
+
+fig = px.scatter_mapbox(
+    station_plot_df,
+    lat="latitude",
+    lon="longitude",
+    hover_name="station_name",
+    hover_data={
+        "address": True,
+        "postcode": True,
+        "price_updatedAt_au": True,
+        "all_fuel_prices_available": True,
+        "latitude": False,
+        "longitude": False,
+        "size": False
+    },
+    size="size",
+    size_max=15,
+    zoom=11,
+    center=CASEY_CENTER,
+    height=560,
+    title="Fuel Stations in Victoria by Postcode"
+)
+
+fig.update_traces(marker=dict(color='#0083B8', opacity=0.7))
 
 fig.update_layout(
-    mapbox=dict(
-        style="open-street-map",
-        center=CASEY_CENTER,
-        zoom=11
-    ),
-    height=560,
+    mapbox_style="open-street-map",
     margin=dict(t=40, b=0, l=0, r=0),
-    title="Fuel Stations in Victoria by Postcode",
-    showlegend=False,
-    hovermode='closest'
+    showlegend=False
 )
 
 st.plotly_chart(fig, use_container_width=True, key="map_chart")
-
-
-
