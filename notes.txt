@@ -1,0 +1,589 @@
+streamlit run rolling_ratings.py
+
+uv remove streamlit pandas vadersentiment cachetools
+
+
+uv add streamlit==1.24.0 pandas==2.5.3 protobuf==3.20.3 vadersentiment==3.3.2 cachetools==7.0.1 altair==4.2.2
+
+
+
+
+uv run fastapi dev main.py --> run the program (CTRL + C to disable)
+
+fastapi dev main.py
+
+uvicorn main_app:app --reload
+
+http://localhost:8000/
+http://localhost:8000/docs
+
+uvicorn main_app:app --host 0.0.0.0 --port 10000 live in render
+
+token - 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
+cd path/to/your/project
+ls -a
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/your-username/fastapi-render-app.git
+git remote -v
+git branch -M main
+git push -u origin main
+
+
+render api key =rnd_17cb1UVo5PRZqdTZfT5m4FTy0jgU
+
+
+postgresql://barrysql:ok0ynHmqcaXM8DaGrpCjm2ExoLyDnlpJ@dpg-d5s76vpr0fns739ekj9g-a/bmsdb1
+
+postgresql://neondb_owner:npg_3Up2ckAvSxVM@ep-delicate-cake-a7grmiif-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+bmsdb1bmsdb1bmsdb1
+bmsdb1postgresql://barrysql:ok0ynHmqcaXM8DaGrpCjm2ExoLyDnlpJ@dpg-d5s76vpr0fns739ekj9g-a/bmsdb1
+Pantera123Mydbsupa
+
+ok0ynHmqcaXM8DaGrpCjm2ExoLyDnlpJ
+
+
+postgresql://barrysql:ok0ynHmqcaXM8DaGrpCjm2ExoLyDnlpJ@dpg-d5s76vpr0fns739ekj9g-a.singapore-postgres.render.com/bmsdb1
+
+
+for sql unique id:
+CREATE OR REPLACE FUNCTION random_string(length INT) RETURNS TEXT AS $$
+DECLARE
+    chars TEXT := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    result TEXT := '';
+    i INT := 0;
+BEGIN
+    FOR i IN 1..length LOOP
+        result := result || substr(chars, (random()*61)::int + 1, 1);
+    END LOOP;
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TABLE users (
+    id TEXT PRIMARY KEY DEFAULT random_string(16),
+    name TEXT NOT NULL
+);
+
+===============================
+
+CREATE TABLE users (
+    id CHAR(32) PRIMARY KEY DEFAULT REPLACE(UUID(), '-', ''),
+    name VARCHAR(100) NOT NULL
+);
+
+
+=======
+stored FUNCTION
+
+DELIMITER $$
+
+CREATE FUNCTION random_string(len INT) RETURNS VARCHAR(255)
+BEGIN
+    DECLARE chars_str VARCHAR(62) DEFAULT '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    DECLARE str VARCHAR(255) DEFAULT '';
+    DECLARE i INT DEFAULT 0;
+    WHILE i < len DO
+        SET str = CONCAT(str, SUBSTRING(chars_str, FLOOR(1 + RAND() * 62), 1));
+        SET i = i + 1;
+    END WHILE;
+    RETURN str;
+END$$
+
+DELIMITER ;
+
+CREATE TABLE users (
+    id VARCHAR(16) PRIMARY KEY DEFAULT random_string(16),
+    name VARCHAR(100)
+);
+
+
+
+
+for sql unique hex id:
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE users (
+    id TEXT PRIMARY KEY DEFAULT 
+       'RID_' || encode(gen_random_bytes(8), 'hex'),  -- 16 hex chars
+    name TEXT NOT NULL
+);
+
+CREATE TABLE users (
+    id TEXT PRIMARY KEY UNIQUE DEFAULT 
+       'RID_' || encode(gen_random_bytes(8), 'hex'),
+    name TEXT NOT NULL
+);
+
+
+====
+google
+
+CREATE OR REPLACE FUNCTION generate_id_md5()
+RETURNS TEXT AS $$
+BEGIN
+  -- 'RID_' (4 chars) + 15 random hex characters = 19 characters total
+  RETURN 'RID_' || SUBSTRING(md5(random()::text) FROM 1 FOR 15);
+END;
+$$ LANGUAGE plpgsql VOLATILE;
+
+
+CREATE TABLE public.your_table_name (
+  id TEXT PRIMARY KEY DEFAULT generate_id_md5(),
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  content TEXT
+);
+
+-- Enable Row Level Security (Supabase standard)
+ALTER TABLE public.your_table_name ENABLE ROW LEVEL SECURITY;
+
+
+-- 1. Add a new column with the custom format
+ALTER TABLE public.your_table_name 
+ADD COLUMN custom_id TEXT DEFAULT generate_id_md5();
+
+-- 2. (Optional) Make it the primary key if replacing an old INT ID
+-- Note: Requires clearing old data or manually populating existing rows first
+ALTER TABLE public.your_table_name 
+ADD CONSTRAINT unique_custom_rid UNIQUE (custom_id);
+
+--------billion records
+-- 1. Create the collision-proof generator function
+CREATE OR REPLACE FUNCTION generate_unique_rid()
+RETURNS TEXT AS $$
+DECLARE
+  new_id TEXT;
+  done BOOL := FALSE;
+BEGIN
+  WHILE NOT done LOOP
+    -- Generate the RID_ + 15 hex char format
+    new_id := 'RID_' || SUBSTRING(md5(random()::text) FROM 1 FOR 15);
+    
+    -- Check if this ID already exists in your table
+    -- REPLACE 'public.your_table_name' with your actual table
+    EXECUTE format('SELECT NOT EXISTS (SELECT 1 FROM public.your_table_name WHERE id = %L)', new_id)
+    INTO done;
+  END LOOP;
+  
+  RETURN new_id;
+END;
+$$ LANGUAGE plpgsql VOLATILE;
+
+-- 2. Apply to your table
+ALTER TABLE public.your_table_name 
+ALTER COLUMN id SET DEFAULT generate_unique_rid();
+
+
+---microsoft T-sql
+
+-- Create the table
+CREATE TABLE dbo.Records (
+    -- We use NVARCHAR(20) to fit "RID_" (4) + 15 hex chars (15) = 19 chars
+    RecordID NVARCHAR(20) PRIMARY KEY,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    Payload NVARCHAR(MAX)
+);
+GO
+
+-- Add a Default Constraint to generate the 'RID_2fb9581b...' format
+-- This uses NEWID() to get randomness and converts it to a hex-like string
+ALTER TABLE dbo.Records 
+ADD CONSTRAINT DF_RecordID DEFAULT (
+    'RID_' + LOWER(SUBSTRING(CONVERT(NVARCHAR(36), NEWID()), 1, 8) + 
+             SUBSTRING(CONVERT(NVARCHAR(36), NEWID()), 1, 7))
+) FOR RecordID;
+GO
+
+-- Test the generation
+INSERT INTO dbo.Records (Payload) VALUES ('Test entry 1'), ('Test entry 2');
+SELECT * FROM dbo.Records;
+
+
+-- 1. Add the column
+ALTER TABLE dbo.YourExistingTable 
+ADD CustomRID NVARCHAR(20);
+GO
+
+-- 2. Apply the generation logic as a default
+ALTER TABLE dbo.YourExistingTable 
+ADD CONSTRAINT DF_CustomRID_Format 
+DEFAULT ('RID_' + LOWER(SUBSTRING(CONVERT(NVARCHAR(36), NEWID()), 1, 15))) 
+FOR CustomRID;
+GO
+
+
+
+------
+UPDATE your_table_name
+SET suburb = CASE 
+    WHEN postcode = '3805' THEN (ARRAY['Narre Warren', 'Narre Warren South'])[floor(random() * 2) + 1]
+    WHEN postcode = '3806' THEN 'Berwick'
+    WHEN postcode = '3977' THEN (ARRAY['Cranbourne', 'Cranbourne North', 'Cranbourne East', 'Botanic Ridge'])[floor(random() * 4) + 1]
+    WHEN postcode = '3975' THEN (ARRAY['Lynbrook', 'Lyndhurst'])[floor(random() * 2) + 1]
+    WHEN postcode = '3802' THEN 'Endeavour Hills'
+    WHEN postcode = '3803' THEN 'Hallam'
+    WHEN postcode = '3804' THEN 'Narre Warren North'
+    WHEN postcode = '3976' THEN 'Hampton Park'
+    ELSE suburb -- Keep existing value if postcode doesn't match
+END
+WHERE (suburb IS NULL OR suburb = ''); -- Only update empty or null Suburb columns
+
+
+
+
+
+-- Create a procedure to handle safe inserts
+CREATE OR ALTER PROCEDURE dbo.InsertWithUniqueRID
+    @Payload NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @NewRID NVARCHAR(20);
+    DECLARE @Exists INT = 1;
+
+    -- Loop until a unique ID is generated
+    WHILE @Exists > 0
+    BEGIN
+        SET @NewRID = 'RID_' + LOWER(SUBSTRING(CONVERT(NVARCHAR(36), NEWID()), 1, 15));
+        
+        SELECT @Exists = COUNT(*) 
+        FROM dbo.YourTableName 
+        WHERE RecordID = @NewRID;
+    END
+
+    -- Final Insert
+    INSERT INTO dbo.YourTableName (RecordID, Payload)
+    VALUES (@NewRID, @Payload);
+    
+    -- Return the ID to the application (useful for Streamlit)
+    SELECT @NewRID AS GeneratedID;
+END;
+GO
+
+
+
+
+
+
+
+
+
+sqlalchemy Base model:
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(
+        Text,
+        primary_key=True,
+        server_default=text(
+            "'RID_' || encode(gen_random_bytes(8), 'hex')"
+        ),
+    )
+
+    name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False
+    )
+
+
+
+
+===========
+CREATE OR REPLACE FUNCTION update_updated_at_columnt_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Set updated_at only on UPDATE
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER set_updated_at
+    BEFORE UPDATE 
+    ON public.api_users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_api_users_updated_at
+BEFORE UPDATE ON api_users
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at_timestamp();
+=======
+
+CREATE OR REPLACE FUNCTION set_updated_at_ignore_columns()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Only update timestamp if meaningful columns changed
+    IF
+        NEW IS DISTINCT FROM OLD
+        AND (
+            NEW.name        IS DISTINCT FROM OLD.name OR
+            NEW.email       IS DISTINCT FROM OLD.email OR
+            NEW.role        IS DISTINCT FROM OLD.role
+        )
+    THEN
+        NEW.updated_at = NOW();
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trg_api_users_updated_at
+BEFORE UPDATE ON api_users
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at_ignore_columns();
+
+
+CREATE OR REPLACE FUNCTION set_updated_at_ignore_self()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW IS DISTINCT FROM OLD THEN
+        NEW.updated_at = NOW();
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+========
+DO $$
+DECLARE
+    r TEXT;
+    tables TEXT[] := ARRAY[
+        'api_users',
+        'orders',
+        'payments'
+    ];
+BEGIN
+    FOREACH r IN ARRAY tables LOOP
+
+        -- Add updated_at column if it does not exist
+        EXECUTE format(
+            'ALTER TABLE %I ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ',
+            r
+        );
+
+        -- Drop trigger if already exists
+        EXECUTE format(
+            'DROP TRIGGER IF EXISTS trg_%I_updated_at ON %I',
+            r, r
+        );
+
+        -- Create trigger
+        EXECUTE format(
+            'CREATE TRIGGER trg_%I_updated_at
+             BEFORE UPDATE ON %I
+             FOR EACH ROW
+             EXECUTE FUNCTION set_updated_at_timestamp()',
+            r, r
+        );
+
+    END LOOP;
+END $$;
+
+=======
+
+DO $$
+DECLARE
+    r RECORD;
+    tables TEXT[] := ARRAY[
+        'api_users',
+        'orders',
+        'payments'
+    ];
+    col_exists BOOLEAN;
+BEGIN
+    FOREACH r IN ARRAY tables LOOP
+
+        -- Check if 'updated_at' column exists
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = r
+              AND column_name = 'updated_at'
+        ) INTO col_exists;
+
+        IF col_exists THEN
+            -- Drop existing trigger (idempotent)
+            EXECUTE format(
+                'DROP TRIGGER IF EXISTS trg_%I_updated_at ON public.%I',
+                r, r
+            );
+
+            -- Create trigger
+            EXECUTE format(
+                'CREATE TRIGGER trg_%I_updated_at
+                 BEFORE UPDATE ON public.%I
+                 FOR EACH ROW
+                 EXECUTE FUNCTION set_updated_at_timestamp()',
+                r, r
+            );
+
+            RAISE NOTICE 'Trigger created on table: %', r;
+        ELSE
+            RAISE NOTICE 'Skipping table % because updated_at does not exist', r;
+        END IF;
+
+    END LOOP;
+END $$;
+
+
+
+
+
+
+
+
+
+
+
+create a csv data with 300 records for research/CX Customer Experience real collective data from Australia, Victoria City Council.
+the csv should include the following columns:
+respo_id - unique id based on this format RID_57208cf0e3afa75
+nps_rating - random ansnwer from 0-10.
+nps_reason - the responses/feedback should be based on nps_rating. avoid duplicate responses
+csat_rating - random answer from 1-5
+csat_reason -  the responses/feedback should be based on csat_rating. avoid duplicate responses
+issue_1 - specific topic/issue raised feedback on csat_reason
+issue_2 - other specific topic/issue raised feedback on csat_reason - do not duplica the response from issue_1 
+department - generate department from City council Victoria, Australia
+team - generate team from City council Victoria, Australia
+survey_date - format YYYY-MM-DD, random data from January 2024 to February 2026
+postcode - randomly generated postcode based on City of Casey suburb
+
+
+
+
+
+
+
+
+ Postcode
+3980
+3977
+3977
+3977
+3980
+3912
+3977
+3977
+3977
+3977
+3805
+3806
+3805
+3977
+3806
+3806
+3802
+3803
+3804
+3980
+3977
+3977
+3978
+3978
+3977
+3977
+3977
+3975
+3977
+3976
+3805
+3976
+3805
+3805
+3805
+3806
+3177
+3177
+3802
+3156
+3975
+3805
+3803
+3804
+3806
+3806
+3802
+3977
+3977
+3978
+3977
+3977
+3978
+3977
+3807
+
+Latitude Coordinate, Longitude Coordinate
+
+
+
+	        count
+1 response	
+Banana	    1
+Orange	    1
+2 responses	
+Apple, Orange	2
+Apple, Banana	1
+3 responses	
+Apple, Banana, Orange	1
+
+
+                       count
+Favorites                    
+1 response                  2 
+  Banana                    1
+  Orange                    1
+2 responses                  4
+  Apple, Banana             2
+  Apple, Orange             2
+3 responses                  1
+  Apple, Banana, Orange     1
+
+
+  "None", "Don't know" and "Not Applicable"
+
+
+  reference-data/stations
+
+  '5370 Sturt Hwy, Cullulleraine, 3496'
+
+
+  if Len() is 4 get/combine str[0] and str[1] in another column name street and if Len() is 5 get/combine str[0][1][2] in street column
+
+  streamlit run vic_fuel_api.py
+
+
+  create a column to tag if duplicate email which are survey recorded
+  within 6 months since the first survey records in pandas, 
+  and also create a column that tags the 1st, 2nd, etc, based on email and startdate, retain the original format
+
+
+
+  Step 2: Generate the CDN Link (The Correct Way)
+Do not use the URL from your browser address bar or the "Raw" button. Instead, follow these patterns:
+
+Method A: Using jsDelivr (Recommended for Production)
+jsDelivr is the most reliable and fastest service for GitHub files.
+URL Pattern:
+https://cdn.jsdelivr.net/gh/USERNAME/REPO_NAME@BRANCH/FILE_PATH.css
+
+Example:
+If your username is barrysigno, repo is fuel-app, and file is assets/style.css on the main branch:
+https://cdn.jsdelivr.net/gh/barrysigno/fuel-app@main/assets/style.css
+
+Method B: Using Statically (Great for development)
+Statically is very easy to use and clears cache quickly.
+URL Pattern:
+https://statically.io/gh/USERNAME/REPO_NAME/BRANCH/FILE_PATH.css
+
+https://github.com/dimebox777/MyCSS/blob/main/testcss.css
+
+
+https://cdn.jsdelivr.net/gh/dimebox777/MyCSS@main/testcss.css
