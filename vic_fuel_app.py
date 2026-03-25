@@ -426,7 +426,7 @@ station_plot_df = station_fuel_details.copy()
 
 ##option
 
-# Before creating the map, verify your data
+## Before creating the map, verify your data
 st.write(f"Number of stations: {len(station_plot_df)}")
 st.write(f"Latitude range: {station_plot_df['latitude'].min()} to {station_plot_df['latitude'].max()}")
 st.write(f"Longitude range: {station_plot_df['longitude'].min()} to {station_plot_df['longitude'].max()}")
