@@ -426,47 +426,160 @@ station_plot_df = station_fuel_details.copy()
 
 ##option
 
-## Before creating the map, verify your data
-st.write(f"Number of stations: {len(station_plot_df)}")
-st.write(f"Latitude range: {station_plot_df['latitude'].min()} to {station_plot_df['latitude'].max()}")
-st.write(f"Longitude range: {station_plot_df['longitude'].min()} to {station_plot_df['longitude'].max()}")
-st.write("Sample data:")
+# ## Before creating the map, verify your data
+# st.write(f"Number of stations: {len(station_plot_df)}")
+# st.write(f"Latitude range: {station_plot_df['latitude'].min()} to {station_plot_df['latitude'].max()}")
+# st.write(f"Longitude range: {station_plot_df['longitude'].min()} to {station_plot_df['longitude'].max()}")
+# st.write("Sample data:")
+# st.dataframe(station_plot_df.head())
+
+# fig = px.scatter_mapbox(station_plot_df,
+#                         lat="latitude",
+#                         lon="longitude",
+#                         hover_name="station_name",
+#                         hover_data={
+#                             "address": True,
+#                             "postcode": False,
+#                             "price_updatedAt_au": True,
+#                             "all_fuel_prices_available": True,
+#                             "latitude": False,
+#                             "longitude": False
+#                         },
+#                         labels={
+#                             "all_fuel_prices_available": "Fuel Available",
+#                             "price_updatedAt_au": 'Last Updated'
+#                         },
+#                         color="postcode",  # Color by postcode
+#                         size=[12] * len(station_plot_df),  # Fixed size
+#                         size_max=15,
+#                         zoom=11,
+#                         center=CASEY_CENTER,
+#                         height=560,
+#                         color_continuous_scale="Viridis",
+#                         title="Fuel Stations in Victoria by Postcode")
+
+# fig.update_layout(
+#     margin=dict(t=0, b=0, l=0, r=0),
+#     coloraxis_colorbar=dict(
+#         thickness=14,
+#         len=0.6,
+#         tickfont=dict(size=10),
+#     ),
+#     paper_bgcolor="rgba(0,0,0,0)",
+#     mapbox_style="open-street-map"
+# )
+
+# st.plotly_chart(fig, use_container_width=True, key="map_chart")
+
+
+
+
+
+# STEP 1: Debug your data first
+st.write("### Debug Information")
+st.write(f"DataFrame shape: {station_plot_df.shape}")
+st.write(f"Number of rows: {len(station_plot_df)}")
+st.write(f"Columns: {station_plot_df.columns.tolist()}")
+
+# Check for missing values
+st.write("Missing values:")
+st.write(station_plot_df[['latitude', 'longitude', 'station_name']].isnull().sum())
+
+# Show sample data
+st.write("Sample data (first 5 rows):")
 st.dataframe(station_plot_df.head())
 
-fig = px.scatter_mapbox(station_plot_df,
-                        lat="latitude",
-                        lon="longitude",
-                        hover_name="station_name",
-                        hover_data={
-                            "address": True,
-                            "postcode": False,
-                            "price_updatedAt_au": True,
-                            "all_fuel_prices_available": True,
-                            "latitude": False,
-                            "longitude": False
-                        },
-                        labels={
-                            "all_fuel_prices_available": "Fuel Available",
-                            "price_updatedAt_au": 'Last Updated'
-                        },
-                        color="postcode",  # Color by postcode
-                        size=[12] * len(station_plot_df),  # Fixed size
-                        size_max=15,
-                        zoom=11,
-                        center=CASEY_CENTER,
-                        height=560,
-                        color_continuous_scale="Viridis",
-                        title="Fuel Stations in Victoria by Postcode")
+# Check data types
+st.write("Data types:")
+st.write(station_plot_df[['latitude', 'longitude']].dtypes)
+
+# Check coordinate ranges
+st.write(f"Latitude range: {station_plot_df['latitude'].min()} to {station_plot_df['latitude'].max()}")
+st.write(f"Longitude range: {station_plot_df['longitude'].min()} to {station_plot_df['longitude'].max()}")
+
+# STEP 2: Clean the data
+# Remove any rows with null coordinates
+station_plot_df_clean = station_plot_df.dropna(subset=['latitude', 'longitude']).copy()
+
+# Ensure coordinates are numeric
+station_plot_df_clean['latitude'] = pd.to_numeric(station_plot_df_clean['latitude'], errors='coerce')
+station_plot_df_clean['longitude'] = pd.to_numeric(station_plot_df_clean['longitude'], errors='coerce')
+
+# Remove any rows that became NaN after conversion
+station_plot_df_clean = station_plot_df_clean.dropna(subset=['latitude', 'longitude'])
+
+st.write(f"Clean data rows: {len(station_plot_df_clean)}")
+
+# STEP 3: Try the simplest possible map first
+st.write("### Test Map 1: Minimal Configuration")
+
+fig_test = px.scatter_mapbox(
+    station_plot_df_clean,
+    lat="latitude",
+    lon="longitude",
+    zoom=10,
+    height=600
+)
+
+fig_test.update_layout(mapbox_style="open-street-map")
+st.plotly_chart(fig_test, use_container_width=True)
+
+# STEP 4: Add basic customization
+st.write("### Test Map 2: With Markers")
+
+fig_test2 = px.scatter_mapbox(
+    station_plot_df_clean,
+    lat="latitude",
+    lon="longitude",
+    zoom=10,
+    height=600
+)
+
+fig_test2.update_traces(marker=dict(size=15, color='red'))
+fig_test2.update_layout(mapbox_style="open-street-map")
+st.plotly_chart(fig_test2, use_container_width=True)
+
+# STEP 5: Full version with all features
+st.write("### Full Map with All Features")
+
+CASEY_CENTER = {"lat": -38.05, "lon": 145.33}
+
+fig = px.scatter_mapbox(
+    station_plot_df_clean,
+    lat="latitude",
+    lon="longitude",
+    hover_name="station_name",
+    hover_data={
+        "address": True,
+        "price_updatedAt_au": True,
+        "all_fuel_prices_available": True,
+        "latitude": False,
+        "longitude": False
+    },
+    zoom=11,
+    center=CASEY_CENTER,
+    height=600
+)
+
+# Explicitly set marker properties
+fig.update_traces(
+    marker=dict(
+        size=15,
+        color='#0083B8',
+        opacity=0.8
+    ),
+    hovertemplate='<b>%{hovertext}</b><br>' +
+                  'Address: %{customdata[0]}<br>' +
+                  'Last Updated: %{customdata[1]}<br>' +
+                  'Fuel Available: %{customdata[2]}<br>' +
+                  '<extra></extra>'
+)
 
 fig.update_layout(
-    margin=dict(t=0, b=0, l=0, r=0),
-    coloraxis_colorbar=dict(
-        thickness=14,
-        len=0.6,
-        tickfont=dict(size=10),
-    ),
-    paper_bgcolor="rgba(0,0,0,0)",
-    mapbox_style="open-street-map"
+    mapbox_style="open-street-map",
+    margin=dict(t=30, b=0, l=0, r=0),
+    title="Fuel Stations in Victoria by Postcode",
+    showlegend=False
 )
 
 st.plotly_chart(fig, use_container_width=True, key="map_chart")
