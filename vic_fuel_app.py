@@ -8,6 +8,9 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 
+import folium
+from streamlit_folium import st_folium
+
 # Generate a random UUID v4 object
 x_transactionid = str(uuid.uuid4())
 
@@ -745,3 +748,37 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig)
+
+
+
+
+
+# Create a Folium map centered on Casey
+m = folium.Map(
+    location=[-38.05, 145.33],
+    zoom_start=11,
+    tiles='OpenStreetMap'
+)
+
+# Add markers for each station
+for idx, row in station_plot_df.iterrows():
+    # Create popup HTML
+    popup_html = f"""
+    <div style="width: 200px;">
+        <h4>{row['station_name']}</h4>
+        <p><b>Address:</b> {row['address']}</p>
+        <p><b>Postcode:</b> {row['postcode']}</p>
+        <p><b>Last Updated:</b> {row['price_updatedAt_au']}</p>
+        <p><b>Fuel Available:</b> {row['all_fuel_prices_available']}</p>
+    </div>
+    """
+    
+    folium.Marker(
+        location=[row['latitude'], row['longitude']],
+        popup=folium.Popup(popup_html, max_width=250),
+        tooltip=row['station_name'],
+        icon=folium.Icon(color='blue', icon='info-sign')
+    ).add_to(m)
+
+# Display the map
+st_folium(m, width=None, height=560)
