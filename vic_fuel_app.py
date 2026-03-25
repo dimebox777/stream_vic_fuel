@@ -406,7 +406,7 @@ fig = px.scatter_mapbox(station_plot_df,
                         ##center={"lat": -38.05, "lon": 145.33},
                         size_max=10,
                         height=560,
-                        map_style="open-street-map",
+                        ##map_style="open-street-map",
                         title="Fuel Stations in Victoria by Postcode")
 
 ##fig.update_layout(mapbox_style="open-street-map")
@@ -419,6 +419,7 @@ fig.update_layout(
             tickfont=dict(size=10),
         ),
         paper_bgcolor="rgba(0,0,0,0)",
+        mapbox_style="open-street-map"
     )
 st.plotly_chart(fig,width='content', key="map_chart")
 ##fig.show()  
