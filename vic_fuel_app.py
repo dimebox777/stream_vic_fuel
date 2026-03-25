@@ -442,19 +442,14 @@ fig = px.scatter_mapbox(station_plot_df,
                             "all_fuel_prices_available": "Fuel Available",
                             "price_updatedAt_au": 'Last Updated'
                         },
+                        color="postcode",  # Color by postcode
+                        size=[12] * len(station_plot_df),  # Fixed size
+                        size_max=15,
                         zoom=11,
                         center=CASEY_CENTER,
                         height=560,
+                        color_continuous_scale="Viridis",
                         title="Fuel Stations in Victoria by Postcode")
-
-# FIXED: Manually set marker size and style
-fig.update_traces(
-    marker=dict(
-        size=12,  # Set marker size
-        opacity=0.8,
-        color='#0083B8'  # Optional: set color
-    )
-)
 
 fig.update_layout(
     margin=dict(t=0, b=0, l=0, r=0),
