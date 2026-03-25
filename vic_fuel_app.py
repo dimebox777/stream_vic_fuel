@@ -815,6 +815,6 @@ st.pydeck_chart(pdk.Deck(
     layers=[layer],
     initial_view_state=view_state,
     tooltip=tooltip,
-    map_stye='mapbox://styles/mapbox/streets-v11'
+    map_style='mapbox://styles/mapbox/streets-v11'
     ##map_style='mapbox://styles/mapbox/light-v9'
 ))
