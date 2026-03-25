@@ -766,3 +766,52 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
+
+
+
+
+
+
+# Prepare the view state
+view_state = pdk.ViewState(
+    latitude=-38.05,
+    longitude=145.33,
+    zoom=11,
+    pitch=0
+)
+
+# Create the scatterplot layer
+layer = pdk.Layer(
+    'ScatterplotLayer',
+    data=station_plot_df,
+    get_position='[longitude, latitude]',
+    get_color='[0, 131, 184, 200]',  # Blue color in RGBA
+    get_radius=150,
+    pickable=True,
+    auto_highlight=True
+)
+
+# Create tooltip
+tooltip = {
+    "html": """
+    <b>{station_name}</b><br/>
+    Address: {address}<br/>
+    Postcode: {postcode}<br/>
+    Last Updated: {price_updatedAt_au}<br/>
+    Fuel Available: {all_fuel_prices_available}
+    """,
+    "style": {
+        "backgroundColor": "#0083B8",
+        "color": "white",
+        "padding": "10px",
+        "borderRadius": "5px"
+    }
+}
+
+# Render the deck
+st.pydeck_chart(pdk.Deck(
+    layers=[layer],
+    initial_view_state=view_state,
+    tooltip=tooltip,
+    map_style='mapbox://styles/mapbox/light-v9'
+))
