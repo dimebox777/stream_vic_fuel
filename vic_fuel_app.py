@@ -753,32 +753,16 @@ station_plot_df = station_fuel_details.copy()
 
 
 
-# Create a Folium map centered on Casey
-m = folium.Map(
-    location=[-38.05, 145.33],
-    zoom_start=11,
-    tiles='OpenStreetMap'
+# Streamlit's map needs columns named 'lat' and 'lon'
+map_data = station_plot_df[['latitude', 'longitude', 'station_name']].copy()
+map_data = map_data.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
+
+st.map(map_data, zoom=11, use_container_width=True)
+
+# Show station details below the map
+st.subheader("Station Details")
+st.dataframe(
+    station_plot_df[['station_name', 'address', 'postcode', 'all_fuel_prices_available', 'price_updatedAt_au']],
+    use_container_width=True,
+    hide_index=True
 )
-
-# Add markers for each station
-for idx, row in station_plot_df.iterrows():
-    # Create popup HTML
-    popup_html = f"""
-    <div style="width: 200px;">
-        <h4>{row['station_name']}</h4>
-        <p><b>Address:</b> {row['address']}</p>
-        <p><b>Postcode:</b> {row['postcode']}</p>
-        <p><b>Last Updated:</b> {row['price_updatedAt_au']}</p>
-        <p><b>Fuel Available:</b> {row['all_fuel_prices_available']}</p>
-    </div>
-    """
-    
-    folium.Marker(
-        location=[row['latitude'], row['longitude']],
-        popup=folium.Popup(popup_html, max_width=250),
-        tooltip=row['station_name'],
-        icon=folium.Icon(color='blue', icon='info-sign')
-    ).add_to(m)
-
-# Display the map
-st_folium(m, width=None, height=560)
