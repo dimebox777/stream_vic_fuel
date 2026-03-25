@@ -630,3 +630,56 @@ st.plotly_chart(fig, use_container_width=True, key="map_chart")
 # )
 
 # st.plotly_chart(fig, use_container_width=True)
+
+
+
+
+
+
+
+# Your CASEY_CENTER
+CASEY_CENTER = {"lat": -38.05, "lon": 145.33}
+
+# Create hover text manually for better control
+hover_texts = []
+for idx, row in station_plot_df.iterrows():
+    hover_text = (
+        f"<b>{row['station_name']}</b><br>"
+        f"Address: {row['address']}<br>"
+        f"Postcode: {row['postcode']}<br>"
+        f"Last Updated: {row['price_updatedAt_au']}<br>"
+        f"Fuel Available: {row['all_fuel_prices_available']}"
+    )
+    hover_texts.append(hover_text)
+
+# Create the map using graph_objects (more reliable than px)
+fig = go.Figure()
+
+fig.add_trace(go.Scattermapbox(
+    lat=station_plot_df['latitude'],
+    lon=station_plot_df['longitude'],
+    mode='markers',
+    marker=dict(
+        size=14,
+        color='#0083B8',
+        opacity=0.7
+    ),
+    text=hover_texts,
+    hoverinfo='text',
+    name='Fuel Stations'
+))
+
+fig.update_layout(
+    mapbox=dict(
+        style="open-street-map",
+        center=CASEY_CENTER,
+        zoom=11
+    ),
+    height=560,
+    margin=dict(t=40, b=0, l=0, r=0),
+    title="Fuel Stations in Victoria by Postcode",
+    showlegend=False,
+    hovermode='closest'
+)
+
+st.plotly_chart(fig, use_container_width=True, key="map_chart")
