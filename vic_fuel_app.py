@@ -502,14 +502,14 @@ station_plot_df = station_fuel_details.copy()
 
 # # STEP 2: Clean the data
 # # Remove any rows with null coordinates
-# station_plot_df_clean = station_plot_df.dropna(subset=['latitude', 'longitude']).copy()
+station_plot_df_clean = station_plot_df.dropna(subset=['latitude', 'longitude']).copy()
 
 # # Ensure coordinates are numeric
-# station_plot_df_clean['latitude'] = pd.to_numeric(station_plot_df_clean['latitude'], errors='coerce')
-# station_plot_df_clean['longitude'] = pd.to_numeric(station_plot_df_clean['longitude'], errors='coerce')
+station_plot_df_clean['latitude'] = pd.to_numeric(station_plot_df_clean['latitude'], errors='coerce')
+station_plot_df_clean['longitude'] = pd.to_numeric(station_plot_df_clean['longitude'], errors='coerce')
 
 # # Remove any rows that became NaN after conversion
-# station_plot_df_clean = station_plot_df_clean.dropna(subset=['latitude', 'longitude'])
+station_plot_df_clean = station_plot_df_clean.dropna(subset=['latitude', 'longitude'])
 
 # st.write(f"Clean data rows: {len(station_plot_df_clean)}")
 
