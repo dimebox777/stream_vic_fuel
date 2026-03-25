@@ -689,42 +689,59 @@ station_plot_df = station_fuel_details.copy()
 
 
 
-# Set Plotly config for GitHub deployment
-config = {
-    'displayModeBar': True,
-    'displaylogo': False,
-    'modeBarButtonsToRemove': ['pan2d', 'lasso2d']
-}
+# # Set Plotly config for GitHub deployment
+# config = {
+#     'displayModeBar': True,
+#     'displaylogo': False,
+#     'modeBarButtonsToRemove': ['pan2d', 'lasso2d']
+# }
 
-# Create the map
-fig = go.Figure()
+# # Create the map
+# fig = go.Figure()
 
-fig.add_trace(go.Scattermapbox(
-    lat=station_plot_df['latitude'],
-    lon=station_plot_df['longitude'],
-    mode='markers',
-    marker=dict(size=14, color='#0083B8'),
-    text=station_plot_df['station_name'],
-    customdata=station_plot_df[['address', 'postcode', 'price_updatedAt_au', 'all_fuel_prices_available']],
-    hovertemplate=(
-        '<b>%{text}</b><br>' +
-        'Address: %{customdata[0]}<br>' +
-        'Postcode: %{customdata[1]}<br>' +
-        'Last Updated: %{customdata[2]}<br>' +
-        'Fuel Available: %{customdata[3]}<br>' +
-        '<extra></extra>'
-    )
-))
+# fig.add_trace(go.Scattermapbox(
+#     lat=station_plot_df['latitude'],
+#     lon=station_plot_df['longitude'],
+#     mode='markers',
+#     marker=dict(size=14, color='#0083B8'),
+#     text=station_plot_df['station_name'],
+#     customdata=station_plot_df[['address', 'postcode', 'price_updatedAt_au', 'all_fuel_prices_available']],
+#     hovertemplate=(
+#         '<b>%{text}</b><br>' +
+#         'Address: %{customdata[0]}<br>' +
+#         'Postcode: %{customdata[1]}<br>' +
+#         'Last Updated: %{customdata[2]}<br>' +
+#         'Fuel Available: %{customdata[3]}<br>' +
+#         '<extra></extra>'
+#     )
+# ))
 
-fig.update_layout(
-    mapbox=dict(
-        style="open-street-map",
-        center={"lat": -38.05, "lon": 145.33},
-        zoom=11
-    ),
-    height=560,
-    margin=dict(t=40, b=0, l=0, r=0),
-    title="Fuel Stations in Victoria by Postcode"
+# fig.update_layout(
+#     mapbox=dict(
+#         style="open-street-map",
+#         center={"lat": -38.05, "lon": 145.33},
+#         zoom=11
+#     ),
+#     height=560,
+#     margin=dict(t=40, b=0, l=0, r=0),
+#     title="Fuel Stations in Victoria by Postcode"
+# )
+
+# st.plotly_chart(fig, use_container_width=True, config=config, key="map_chart")
+
+
+# Absolute simplest version possible
+fig = px.scatter_mapbox(
+    station_plot_df,
+    lat="latitude",
+    lon="longitude",
+    text="station_name"
 )
 
-st.plotly_chart(fig, use_container_width=True, config=config, key="map_chart")
+fig.update_traces(marker={'size': 20, 'color': 'red'})
+fig.update_layout(
+    mapbox={'style': "open-street-map", 'zoom': 11, 'center': {"lat": -38.05, "lon": 145.33}},
+    height=600
+)
+
+st.plotly_chart(fig)
