@@ -426,11 +426,6 @@ station_plot_df = station_fuel_details.copy()
 
 ##option
 
-
-
-# Add a constant size column to your dataframe
-station_plot_df['marker_size'] = 10
-
 fig = px.scatter_mapbox(station_plot_df,
                         lat="latitude",
                         lon="longitude",
@@ -441,19 +436,25 @@ fig = px.scatter_mapbox(station_plot_df,
                             "price_updatedAt_au": True,
                             "all_fuel_prices_available": True,
                             "latitude": False,
-                            "longitude": False,
-                            "marker_size": False  # Hide from hover
+                            "longitude": False
                         },
                         labels={
                             "all_fuel_prices_available": "Fuel Available",
                             "price_updatedAt_au": 'Last Updated'
                         },
-                        size="marker_size",  # Use the column
-                        size_max=15,
                         zoom=11,
                         center=CASEY_CENTER,
                         height=560,
                         title="Fuel Stations in Victoria by Postcode")
+
+# FIXED: Manually set marker size and style
+fig.update_traces(
+    marker=dict(
+        size=12,  # Set marker size
+        opacity=0.8,
+        color='#0083B8'  # Optional: set color
+    )
+)
 
 fig.update_layout(
     margin=dict(t=0, b=0, l=0, r=0),
@@ -466,4 +467,4 @@ fig.update_layout(
     mapbox_style="open-street-map"
 )
 
-st.plotly_chart(fig, use_container_width=True, key="map_chart2")
+st.plotly_chart(fig, use_container_width=True, key="map_chart")
