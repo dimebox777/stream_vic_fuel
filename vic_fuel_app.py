@@ -955,11 +955,11 @@ deck = pdk.Deck(
     map_style=map_styles[selected_map]
 )
 
+st.pydeck_chart(deck)
 
-##st.pydeck_chart(deck)
 
 # # Display map and get the clicked object
-event = st.pydeck_chart(deck, on_select="rerun", selection_mode="single-object")
+##event = st.pydeck_chart(deck, on_select="rerun", selection_mode="single-object")
 
 # st.markdown("---")
 
