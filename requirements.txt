@@ -1,8 +1,9 @@
 pandas
 requests
-streamlit==1.30.0
+##streamlit==1.30.0
+streamlit>=1.32
 altair==4.2.2
-plotly
+plotly==5.22.0
 streamlit-folium
 pydeck
 streamlit-plotly-events
