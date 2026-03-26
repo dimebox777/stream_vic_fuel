@@ -294,21 +294,19 @@ st.write(df[["latitude", "longitude"]].head())
 st.write(len(df))
 
 
-test_df = pd.DataFrame({
+df = pd.DataFrame({
     "latitude": [-37.8136, -37.82],
     "longitude": [144.9631, 144.97],
     "station_name": ["Test 1", "Test 2"]
 })
 
-fig = px.scatter_mapbox(
-    test_df,
+fig = px.scatter_map(
+    df,
     lat="latitude",
     lon="longitude",
     hover_name="station_name",
     zoom=10,
     height=500
 )
-
-fig.update_layout(mapbox_style="open-street-map")
 
 st.plotly_chart(fig, use_container_width=True)
