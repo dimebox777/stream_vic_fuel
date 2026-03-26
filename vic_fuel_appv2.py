@@ -294,11 +294,11 @@ st.write(df[["latitude", "longitude"]].head())
 st.write(len(df))
 
 
-df = pd.DataFrame({
-    "latitude": [-37.8136, -37.82],
-    "longitude": [144.9631, 144.97],
-    "station_name": ["Test 1", "Test 2"]
-})
+# df = pd.DataFrame({
+#     "latitude": [-37.8136, -37.82],
+#     "longitude": [144.9631, 144.97],
+#     "station_name": ["Test 1", "Test 2"]
+# })
 
 fig = px.scatter_mapbox(
     df,
