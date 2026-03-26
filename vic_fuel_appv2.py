@@ -174,86 +174,111 @@ station_plot_df = station_fuel_details.copy()
 # --- PREP DATA ---
 df = station_plot_df.copy()
 
-# Ensure proper types
-df["latitude"] = df["latitude"].astype(float)
-df["longitude"] = df["longitude"].astype(float)
-df["price_updatedAt_au"] = pd.to_datetime(
-    df["price_updatedAt_au"], errors="coerce"
-).dt.strftime("%d %b %Y %I:%M %p")
+# # Ensure proper types
+# df["latitude"] = df["latitude"].astype(float)
+# df["longitude"] = df["longitude"].astype(float)
+# df["price_updatedAt_au"] = pd.to_datetime(
+#     df["price_updatedAt_au"], errors="coerce"
+# ).dt.strftime("%d %b %Y %I:%M %p")
 
-# --- SIDEBAR FILTERS ---
-st.sidebar.header("🔎 Filters")
+# # --- SIDEBAR FILTERS ---
+# st.sidebar.header("🔎 Filters")
 
-postcode_filter = st.sidebar.multiselect(
-    "Filter by Postcode",
-    options=sorted(df["postcode"].dropna().unique())
-)
+# postcode_filter = st.sidebar.multiselect(
+#     "Filter by Postcode",
+#     options=sorted(df["postcode"].dropna().unique())
+# )
 
-fuel_filter = st.sidebar.text_input(
-    "Filter Fuel Type (e.g. U91, Diesel)"
-)
+# fuel_filter = st.sidebar.text_input(
+#     "Filter Fuel Type (e.g. U91, Diesel)"
+# )
 
-# Apply filters
-if postcode_filter:
-    df = df[df["postcode"].isin(postcode_filter)]
+# # Apply filters
+# if postcode_filter:
+#     df = df[df["postcode"].isin(postcode_filter)]
 
-if fuel_filter:
-    df = df[df["all_fuel_prices_available"].str.contains(fuel_filter, case=False, na=False)]
+# if fuel_filter:
+#     df = df[df["all_fuel_prices_available"].str.contains(fuel_filter, case=False, na=False)]
 
-# --- MAP ---
+# # --- MAP ---
+# fig = px.scatter_mapbox(
+#     df,
+#     lat="latitude",
+#     lon="longitude",
+#     hover_name="station_name",
+#     hover_data={
+#         "address": True,
+#         "postcode": True,
+#         "price_updatedAt_au": True,
+#         "latitude": False,
+#         "longitude": False
+#     },
+#     zoom=11,
+#     height=550
+# )
+
+# fig.update_layout(
+#     mapbox_style="open-street-map",
+#     margin={"r":0,"t":0,"l":0,"b":0}
+# )
+
+# # --- CLICK EVENTS ---
+# selected_points = plotly_events(fig, click_event=True, hover_event=False)
+
+# st.plotly_chart(fig, use_container_width=True)
+
+# # --- HANDLE CLICK ---
+# if selected_points:
+#     idx = selected_points[0]["pointIndex"]
+#     selected_station = df.iloc[idx]
+
+#     st.markdown("## 📍 Selected Station")
+
+#     col1, col2 = st.columns(2)
+
+#     with col1:
+#         st.markdown(f"**Name:** {selected_station['station_name']}")
+#         st.markdown(f"**Address:** {selected_station['address']}")
+#         st.markdown(f"**Postcode:** {selected_station['postcode']}")
+
+#     with col2:
+#         st.markdown(f"**Last Updated:** {selected_station['price_updatedAt_au']}")
+#         st.markdown(f"**Fuel Available:** {selected_station['all_fuel_prices_available']}")
+
+#     st.markdown("### 📊 Full Details")
+#     st.dataframe(
+#         pd.DataFrame(selected_station).T,
+#         use_container_width=True
+#     )
+
+# else:
+#     st.info("👆 Click on a station on the map to view details")
+
+# # --- OPTIONAL TABLE ---
+# with st.expander("📋 View Filtered Stations"):
+#     st.dataframe(df, use_container_width=True)
+
+
+df = station_plot_df.copy()
+
+df["latitude"] = pd.to_numeric(df["latitude"], errors="coerce")
+df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
+
+df = df.dropna(subset=["latitude", "longitude"])
+
+st.write("Rows after cleaning:", len(df))
+
 fig = px.scatter_mapbox(
     df,
     lat="latitude",
     lon="longitude",
     hover_name="station_name",
-    hover_data={
-        "address": True,
-        "postcode": True,
-        "price_updatedAt_au": True,
-        "latitude": False,
-        "longitude": False
-    },
-    zoom=11,
-    height=550
+    zoom=10,
+    height=500
 )
 
-fig.update_layout(
-    mapbox_style="open-street-map",
-    margin={"r":0,"t":0,"l":0,"b":0}
-)
+fig.update_layout(mapbox_style="open-street-map")
 
-# --- CLICK EVENTS ---
-selected_points = plotly_events(fig, click_event=True, hover_event=False)
+fig.update_traces(marker=dict(size=10))
 
 st.plotly_chart(fig, use_container_width=True)
-
-# --- HANDLE CLICK ---
-if selected_points:
-    idx = selected_points[0]["pointIndex"]
-    selected_station = df.iloc[idx]
-
-    st.markdown("## 📍 Selected Station")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown(f"**Name:** {selected_station['station_name']}")
-        st.markdown(f"**Address:** {selected_station['address']}")
-        st.markdown(f"**Postcode:** {selected_station['postcode']}")
-
-    with col2:
-        st.markdown(f"**Last Updated:** {selected_station['price_updatedAt_au']}")
-        st.markdown(f"**Fuel Available:** {selected_station['all_fuel_prices_available']}")
-
-    st.markdown("### 📊 Full Details")
-    st.dataframe(
-        pd.DataFrame(selected_station).T,
-        use_container_width=True
-    )
-
-else:
-    st.info("👆 Click on a station on the map to view details")
-
-# --- OPTIONAL TABLE ---
-with st.expander("📋 View Filtered Stations"):
-    st.dataframe(df, use_container_width=True)
