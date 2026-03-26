@@ -307,5 +307,5 @@ fig = px.scatter_mapbox(
     zoom=10
 )
 
-fig.update_layout(mapbox_style="carto-positron")
+fig.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig)
