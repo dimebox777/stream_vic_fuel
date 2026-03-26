@@ -896,6 +896,8 @@ station_plot_df = station_fuel_details.copy()
 
 st.dataframe(station_plot_df.dtypes)
 
+
+
 st.title("Fuel Stations Map")
 
 # Map style selector
@@ -950,6 +952,9 @@ deck = pdk.Deck(
     tooltip=tooltip,
     map_style=map_styles[selected_map]
 )
+
+
+st.pydeck_chart(deck)
 
 # # Display map and get the clicked object
 # event = st.pydeck_chart(deck, on_select="rerun", selection_mode="single-object")
