@@ -300,13 +300,12 @@ df = pd.DataFrame({
     "station_name": ["Test 1", "Test 2"]
 })
 
-fig = px.scatter_map(
+fig = px.scatter_mapbox(
     df,
     lat="latitude",
     lon="longitude",
-    hover_name="station_name",
-    zoom=10,
-    height=500
+    zoom=10
 )
 
-st.plotly_chart(fig, use_container_width=True)
+fig.update_layout(mapbox_style="carto-positron")
+st.plotly_chart(fig)
