@@ -344,4 +344,5 @@ fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         mapbox_style="open-street-map"
         )
-st.plotly_chart(fig)
+#st.plotly_chart(fig)
+st.plotly_chart(fig,width='content', key="map_chart")
