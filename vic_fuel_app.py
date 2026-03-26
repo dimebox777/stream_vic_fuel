@@ -951,53 +951,53 @@ deck = pdk.Deck(
     map_style=map_styles[selected_map]
 )
 
-# Display map and get the clicked object
-event = st.pydeck_chart(deck, on_select="rerun", selection_mode="single-object")
+# # Display map and get the clicked object
+# event = st.pydeck_chart(deck, on_select="rerun", selection_mode="single-object")
 
-st.markdown("---")
+# st.markdown("---")
 
-# Display clicked station details
-if event and event.selection and "indices" in event.selection:
-    # Get the clicked row index
-    clicked_indices = event.selection["indices"]
+# # Display clicked station details
+# if event and event.selection and "indices" in event.selection:
+#     # Get the clicked row index
+#     clicked_indices = event.selection["indices"]
     
-    if clicked_indices:
-        clicked_index = clicked_indices[0]
-        clicked_station = station_plot_df.iloc[clicked_index]
+#     if clicked_indices:
+#         clicked_index = clicked_indices[0]
+#         clicked_station = station_plot_df.iloc[clicked_index]
         
-        # Display selected station info
-        st.subheader(f"📍 Selected Station: {clicked_station['station_name']}")
+#         # Display selected station info
+#         st.subheader(f"📍 Selected Station: {clicked_station['station_name']}")
         
-        # Create a nice display
-        col1, col2 = st.columns(2)
+#         # Create a nice display
+#         col1, col2 = st.columns(2)
         
-        with col1:
-            st.markdown(f"**Address:** {clicked_station['address']}")
-            st.markdown(f"**Postcode:** {clicked_station['postcode']}")
+#         with col1:
+#             st.markdown(f"**Address:** {clicked_station['address']}")
+#             st.markdown(f"**Postcode:** {clicked_station['postcode']}")
         
-        with col2:
-            st.markdown(f"**Last Updated:** {clicked_station['price_updatedAt_au']}")
-            st.markdown(f"**Fuel Available:** {clicked_station['all_fuel_prices_available']}")
+#         with col2:
+#             st.markdown(f"**Last Updated:** {clicked_station['price_updatedAt_au']}")
+#             st.markdown(f"**Fuel Available:** {clicked_station['all_fuel_prices_available']}")
         
-        # Show full details in dataframe
-        st.markdown("#### Full Station Details")
-        st.dataframe(
-            pd.DataFrame([clicked_station]).T.rename(columns={clicked_index: "Value"}),
-            use_container_width=True
-        )
-else:
-    st.info("👆 Click on a marker on the map to see station details")
+#         # Show full details in dataframe
+#         st.markdown("#### Full Station Details")
+#         st.dataframe(
+#             pd.DataFrame([clicked_station]).T.rename(columns={clicked_index: "Value"}),
+#             use_container_width=True
+#         )
+# else:
+#     st.info("👆 Click on a marker on the map to see station details")
 
-# Optional: Show all stations below
-with st.expander("📋 View All Stations"):
-    st.dataframe(
-        station_plot_df[[
-            'station_name', 
-            'address', 
-            'postcode', 
-            'all_fuel_prices_available', 
-            'price_updatedAt_au'
-        ]],
-        use_container_width=True,
-        hide_index=True
-    )
+# # Optional: Show all stations below
+# with st.expander("📋 View All Stations"):
+#     st.dataframe(
+#         station_plot_df[[
+#             'station_name', 
+#             'address', 
+#             'postcode', 
+#             'all_fuel_prices_available', 
+#             'price_updatedAt_au'
+#         ]],
+#         use_container_width=True,
+#         hide_index=True
+#     )
