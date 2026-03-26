@@ -268,8 +268,31 @@ df = df.dropna(subset=["latitude", "longitude"])
 
 st.write("Rows after cleaning:", len(df))
 
+# fig = px.scatter_mapbox(
+#     df,
+#     lat="latitude",
+#     lon="longitude",
+#     hover_name="station_name",
+#     zoom=10,
+#     height=500
+# )
+
+# fig.update_layout(mapbox_style="open-street-map")
+
+# fig.update_traces(marker=dict(size=10))
+
+# st.plotly_chart(fig, use_container_width=True)
+
+
+
+test_df = pd.DataFrame({
+    "latitude": [-37.8136, -37.82],
+    "longitude": [144.9631, 144.97],
+    "station_name": ["Test 1", "Test 2"]
+})
+
 fig = px.scatter_mapbox(
-    df,
+    test_df,
     lat="latitude",
     lon="longitude",
     hover_name="station_name",
@@ -278,7 +301,5 @@ fig = px.scatter_mapbox(
 )
 
 fig.update_layout(mapbox_style="open-street-map")
-
-fig.update_traces(marker=dict(size=10))
 
 st.plotly_chart(fig, use_container_width=True)
