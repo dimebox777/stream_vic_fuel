@@ -755,19 +755,19 @@ station_plot_df = station_fuel_details.copy()
 
 
 
-# Streamlit's map needs columns named 'lat' and 'lon'
-map_data = station_plot_df[['latitude', 'longitude', 'station_name']].copy()
-map_data = map_data.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
+# # Streamlit's map needs columns named 'lat' and 'lon'
+# map_data = station_plot_df[['latitude', 'longitude', 'station_name']].copy()
+# map_data = map_data.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
 
-st.map(map_data, zoom=11, use_container_width=True)
+# st.map(map_data, zoom=11, use_container_width=True)
 
-# Show station details below the map
-st.subheader("Station Details")
-st.dataframe(
-    station_plot_df[['station_name', 'address', 'postcode', 'all_fuel_prices_available', 'price_updatedAt_au']],
-    use_container_width=True,
-    hide_index=True
-)
+# # Show station details below the map
+# st.subheader("Station Details")
+# st.dataframe(
+#     station_plot_df[['station_name', 'address', 'postcode', 'all_fuel_prices_available', 'price_updatedAt_au']],
+#     use_container_width=True,
+#     hide_index=True
+# )
 
 
 
@@ -825,26 +825,87 @@ st.dataframe(
 
 
 # Sidebar controls
-st.sidebar.subheader("Map Settings")
+#st.sidebar.subheader("Map Settings")
+
+# # Map style selector
+# map_styles = {
+#     'Light': 'mapbox://styles/mapbox/light-v9',
+#     'Dark': 'mapbox://styles/mapbox/dark-v9',
+#     'Streets': 'mapbox://styles/mapbox/streets-v11',
+#     'Outdoors': 'mapbox://styles/mapbox/outdoors-v11',
+#     'Satellite': 'mapbox://styles/mapbox/satellite-v9',
+#     'Satellite + Streets': 'mapbox://styles/mapbox/satellite-streets-v11'
+# }
+
+# selected_map = st.sidebar.selectbox(
+#     "Select Map Type:",
+#     options=list(map_styles.keys()),
+#     index=0
+# )
+
+# # Marker size control
+# marker_size = st.sidebar.slider("Marker Size:", 50, 300, 150)
+
+# # View state
+# view_state = pdk.ViewState(
+#     latitude=-38.05,
+#     longitude=145.33,
+#     zoom=11,
+#     pitch=0
+# )
+
+# # Layer
+# layer = pdk.Layer(
+#     'ScatterplotLayer',
+#     data=station_plot_df,
+#     get_position='[longitude, latitude]',
+#     get_color='[0, 131, 184, 200]',
+#     get_radius=marker_size,
+#     pickable=True,
+#     auto_highlight=True
+# )
+
+# # Tooltip
+# tooltip = {
+#     "html": """
+#     <b>{station_name}</b><br/>
+#     Address: {address}<br/>
+#     Postcode: {postcode}<br/>
+#     Last Updated: {price_updatedAt_au}<br/>
+#     Fuel Available: {all_fuel_prices_available}
+#     """,
+#     "style": {
+#         "backgroundColor": "#0083B8",
+#         "color": "white",
+#         "padding": "10px",
+#         "borderRadius": "5px"
+#     }
+# }
+
+# # Render
+# st.pydeck_chart(pdk.Deck(
+#     layers=[layer],
+#     initial_view_state=view_state,
+#     tooltip=tooltip,
+#     map_style=map_styles[selected_map]
+# ))
+
+
+
+######
+
+
+
+st.title("Fuel Stations Map")
 
 # Map style selector
 map_styles = {
     'Light': 'mapbox://styles/mapbox/light-v9',
-    'Dark': 'mapbox://styles/mapbox/dark-v9',
     'Streets': 'mapbox://styles/mapbox/streets-v11',
-    'Outdoors': 'mapbox://styles/mapbox/outdoors-v11',
-    'Satellite': 'mapbox://styles/mapbox/satellite-v9',
-    'Satellite + Streets': 'mapbox://styles/mapbox/satellite-streets-v11'
+    'Satellite Streets': 'mapbox://styles/mapbox/satellite-streets-v11'
 }
 
-selected_map = st.sidebar.selectbox(
-    "Select Map Type:",
-    options=list(map_styles.keys()),
-    index=0
-)
-
-# Marker size control
-marker_size = st.sidebar.slider("Marker Size:", 50, 300, 150)
+selected_map = st.sidebar.selectbox("Map Style:", list(map_styles.keys()), index=0)
 
 # View state
 view_state = pdk.ViewState(
@@ -860,7 +921,7 @@ layer = pdk.Layer(
     data=station_plot_df,
     get_position='[longitude, latitude]',
     get_color='[0, 131, 184, 200]',
-    get_radius=marker_size,
+    get_radius=150,
     pickable=True,
     auto_highlight=True
 )
@@ -882,10 +943,61 @@ tooltip = {
     }
 }
 
-# Render
-st.pydeck_chart(pdk.Deck(
+# Render map and capture click events
+deck = pdk.Deck(
     layers=[layer],
     initial_view_state=view_state,
     tooltip=tooltip,
     map_style=map_styles[selected_map]
-))
+)
+
+# Display map and get the clicked object
+event = st.pydeck_chart(deck, on_select="rerun", selection_mode="single-object")
+
+st.markdown("---")
+
+# Display clicked station details
+if event and event.selection and "indices" in event.selection:
+    # Get the clicked row index
+    clicked_indices = event.selection["indices"]
+    
+    if clicked_indices:
+        clicked_index = clicked_indices[0]
+        clicked_station = station_plot_df.iloc[clicked_index]
+        
+        # Display selected station info
+        st.subheader(f"📍 Selected Station: {clicked_station['station_name']}")
+        
+        # Create a nice display
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown(f"**Address:** {clicked_station['address']}")
+            st.markdown(f"**Postcode:** {clicked_station['postcode']}")
+        
+        with col2:
+            st.markdown(f"**Last Updated:** {clicked_station['price_updatedAt_au']}")
+            st.markdown(f"**Fuel Available:** {clicked_station['all_fuel_prices_available']}")
+        
+        # Show full details in dataframe
+        st.markdown("#### Full Station Details")
+        st.dataframe(
+            pd.DataFrame([clicked_station]).T.rename(columns={clicked_index: "Value"}),
+            use_container_width=True
+        )
+else:
+    st.info("👆 Click on a marker on the map to see station details")
+
+# Optional: Show all stations below
+with st.expander("📋 View All Stations"):
+    st.dataframe(
+        station_plot_df[[
+            'station_name', 
+            'address', 
+            'postcode', 
+            'all_fuel_prices_available', 
+            'price_updatedAt_au'
+        ]],
+        use_container_width=True,
+        hide_index=True
+    )
