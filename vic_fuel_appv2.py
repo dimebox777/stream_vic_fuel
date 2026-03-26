@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 from streamlit_plotly_events import plotly_events
 
+import requests
 
 import uuid
 
