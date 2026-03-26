@@ -894,7 +894,7 @@ station_plot_df = station_fuel_details.copy()
 
 ######
 
-
+st.write(station_plot_df.dtypes)
 
 st.title("Fuel Stations Map")
 
