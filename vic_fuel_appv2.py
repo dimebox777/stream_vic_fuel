@@ -283,7 +283,9 @@ st.write("Rows after cleaning:", len(df))
 
 # st.plotly_chart(fig, use_container_width=True)
 
-
+st.write("Columns:", df.columns)
+st.write("Row count:", len(df))
+st.write(df[["latitude", "longitude"]].head(10))
 
 test_df = pd.DataFrame({
     "latitude": [-37.8136, -37.82],
