@@ -300,12 +300,37 @@ st.write(len(df))
 #     "station_name": ["Test 1", "Test 2"]
 # })
 
-fig = px.scatter_mapbox(
-    df,
-    lat="latitude",
-    lon="longitude",
-    zoom=10
-)
+# fig = px.scatter_mapbox(
+#     df,
+#     lat="latitude",
+#     lon="longitude",
+#     zoom=10
+# )
+
+
+fig = px.scatter_mapbox(station_plot_df,
+                        lat="latitude",
+                        lon="longitude",
+                        hover_name="station_name", # Display station name on hover
+                        hover_data={
+                                    "address": True,
+                                    "postcode": False,
+                                    "price_updatedAt_au": True, # Include in hover_data
+                                    "all_fuel_prices_available": True, # New aggregated info for all fuel types and prices
+                                    "latitude": False,
+                                    "longitude": False
+                                    },
+                        labels={
+                                  "all_fuel_prices_available":"Fuel Available",
+                                  "price_updatedAt_au": 'Last Updated' # Rename in hover tooltip
+                                    },
+                        zoom=11,
+                        center=CASEY_CENTER,
+                        ##center={"lat": -38.05, "lon": 145.33},
+                        size_max=10,
+                        height=560,
+                        ##map_style="open-street-map",
+                        title="Fuel Stations in Victoria by Postcode")
 
 fig.update_layout(mapbox_style="open-street-map")
 st.plotly_chart(fig)
