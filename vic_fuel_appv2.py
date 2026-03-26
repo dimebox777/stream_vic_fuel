@@ -332,5 +332,16 @@ fig = px.scatter_mapbox(station_plot_df,
                         ##map_style="open-street-map",
                         title="Fuel Stations in Victoria by Postcode")
 
-fig.update_layout(mapbox_style="open-street-map")
+#fig.update_layout(mapbox_style="open-street-map")
+fig.update_layout(
+        margin=dict(t=0, b=0, l=0, r=0),
+        coloraxis_colorbar=dict(
+            ##title=metric,
+            thickness=14,
+            len=0.6,
+            tickfont=dict(size=10),
+        ),
+        paper_bgcolor="rgba(0,0,0,0)",
+        mapbox_style="open-street-map"
+        )
 st.plotly_chart(fig)
