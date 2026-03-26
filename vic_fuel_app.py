@@ -900,6 +900,8 @@ st.dataframe(station_plot_df.dtypes)
 
 st.title("Fuel Stations Map")
 
+station_plot_df["price_updatedAt_au"] = station_plot_df["price_updatedAt_au"].astype(str)
+
 # Map style selector
 map_styles = {
     'Light': 'mapbox://styles/mapbox/light-v9',
