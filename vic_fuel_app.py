@@ -819,3 +819,73 @@ st.pydeck_chart(pdk.Deck(
     ##map_style='mapbox://styles/mapbox/streets-v11'
     ##map_style='mapbox://styles/mapbox/light-v9'
 ))
+
+
+
+
+
+# Sidebar controls
+st.sidebar.subheader("Map Settings")
+
+# Map style selector
+map_styles = {
+    'Light': 'mapbox://styles/mapbox/light-v9',
+    'Dark': 'mapbox://styles/mapbox/dark-v9',
+    'Streets': 'mapbox://styles/mapbox/streets-v11',
+    'Outdoors': 'mapbox://styles/mapbox/outdoors-v11',
+    'Satellite': 'mapbox://styles/mapbox/satellite-v9',
+    'Satellite + Streets': 'mapbox://styles/mapbox/satellite-streets-v11'
+}
+
+selected_map = st.sidebar.selectbox(
+    "Select Map Type:",
+    options=list(map_styles.keys()),
+    index=0
+)
+
+# Marker size control
+marker_size = st.sidebar.slider("Marker Size:", 50, 300, 150)
+
+# View state
+view_state = pdk.ViewState(
+    latitude=-38.05,
+    longitude=145.33,
+    zoom=11,
+    pitch=0
+)
+
+# Layer
+layer = pdk.Layer(
+    'ScatterplotLayer',
+    data=station_plot_df,
+    get_position='[longitude, latitude]',
+    get_color='[0, 131, 184, 200]',
+    get_radius=marker_size,
+    pickable=True,
+    auto_highlight=True
+)
+
+# Tooltip
+tooltip = {
+    "html": """
+    <b>{station_name}</b><br/>
+    Address: {address}<br/>
+    Postcode: {postcode}<br/>
+    Last Updated: {price_updatedAt_au}<br/>
+    Fuel Available: {all_fuel_prices_available}
+    """,
+    "style": {
+        "backgroundColor": "#0083B8",
+        "color": "white",
+        "padding": "10px",
+        "borderRadius": "5px"
+    }
+}
+
+# Render
+st.pydeck_chart(pdk.Deck(
+    layers=[layer],
+    initial_view_state=view_state,
+    tooltip=tooltip,
+    map_style=map_styles[selected_map]
+))
